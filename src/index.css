@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+  }
+  /* Visible focus ring for keyboard users on every control */
+  :focus-visible {
+    outline: 3px solid var(--color-indigo-500);
+    outline-offset: 2px;
+  }
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+  }
+}
