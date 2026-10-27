@@ -30,7 +30,6 @@ export default function App() {
   if (!mySeason) return <SeasonPickerPage onSelect={chooseSeason} />;
 
   const season = getSeason(mySeason);
-  const isPlaceholder = PALETTES.find((p) => p.seasonId === mySeason)?.source === 'seed';
 
   return (
     <>
@@ -60,7 +59,6 @@ export default function App() {
               season={season}
               score={result.score}
               verdict={result.verdict}
-              isPlaceholder={isPlaceholder}
             />
             <SeasonRanking ranking={result.ranking} mySeasonId={mySeason} />
           </>

@@ -1,7 +1,6 @@
 import type { Season } from '../data/seasons';
 import { readableTextOn } from '../lib/color';
 import type { SeasonScore, Verdict, VerdictLevel } from '../lib/score';
-import { PlaceholderBadge } from './PlaceholderBadge';
 
 // Always text + symbol, never color alone. Colors chosen for ≥ 4.5:1 contrast in both themes.
 const LEVEL_STYLE: Record<VerdictLevel, { label: string; symbol: string; className: string }> = {
@@ -27,10 +26,9 @@ interface VerdictCardProps {
   season: Season;
   score: SeasonScore;
   verdict: Verdict;
-  isPlaceholder: boolean;
 }
 
-export function VerdictCard({ hex, season, score, verdict, isPlaceholder }: VerdictCardProps) {
+export function VerdictCard({ hex, season, score, verdict }: VerdictCardProps) {
   const style = LEVEL_STYLE[verdict.level];
   return (
     <section
@@ -67,12 +65,9 @@ export function VerdictCard({ hex, season, score, verdict, isPlaceholder }: Verd
         </div>
 
         <div>
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-medium text-stone-700 dark:text-stone-300">
-              Closest in your palette
-            </h3>
-            {isPlaceholder && <PlaceholderBadge />}
-          </div>
+          <h3 className="mb-2 text-sm font-medium text-stone-700 dark:text-stone-300">
+            Closest in your palette
+          </h3>
           <ul className="grid grid-cols-3 gap-2">
             {score.nearest.map((n) => (
               <li key={n.hex} className="overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700">

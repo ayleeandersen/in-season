@@ -22,20 +22,26 @@ npm run preview   # serve the production build locally
 Other scripts:
 
 ```bash
-npm run seed      # regenerate the placeholder palettes (overwrites src/data/palettes.ts)
+npm run seed      # rebuild the placeholder backup in src/data/palettes.seed.ts
 npm run icons     # regenerate the PWA icons in public/
 ```
 
 To try it on your phone during development, run `npm run dev -- --host` and open the "Network" URL on a phone on the same Wi-Fi.
 
-## Replace a season's placeholder palette with curated hex codes
+## Where the palettes come from
 
-Each season starts with a generated **placeholder** palette, and the app shows a "Placeholder palette" badge for it. To use your own swatches for a season:
+All 12 palettes were sampled from the gradient palette charts published by [Elemental Colour](https://elementalcolour.com.au/blog/soft-summer) (one blog post per season, fetched 2026-10-27). Each season has 156–222 evenly spaced swatches taken along those gradients. The source page is noted above each palette in `src/data/palettes.ts`. These are for personal use. The colors belong to Elemental Colour's work, so check with them before publishing the app.
+
+Each season's L\*/C\* range in `src/data/seasons.ts` covers the middle 90% of its palette.
+
+## Replace a season's palette with your own hex codes
+
+To use your own swatches for a season, for example from a palette card:
 
 1. Open `src/data/palettes.ts`.
 2. Find the block for the season, for example `seasonId: 'soft-summer'`.
-3. Replace the `swatches` array with your hex codes. Use `"#RRGGBB"` format, with 40–60 colors and no duplicates.
-4. Change `source: 'seed'` to `source: 'curated'`. This removes the badge.
+3. Replace the `swatches` array with your hex codes. Use `"#RRGGBB"` format, with 40–250 colors and no duplicates. Aim for even spacing, with no big jumps between similar shades.
+4. Make sure it says `source: 'curated'`.
 5. Run `npm test`.
 
 ```ts
@@ -48,9 +54,15 @@ Each season starts with a generated **placeholder** palette, and the app shows a
   },
 ```
 
-**After curating, don't run `npm run seed`.** It regenerates the whole file and would overwrite your palettes.
+### Switch back to the placeholder palettes
 
-The tests check every palette, curated ones included. One check is **palette density**: at least 95% of swatches, counted across all seasons, need another swatch in the same season within ΔE 6. If it fails, your palette has gaps. Fill them with in-between shades rather than changing the threshold.
+The original generated placeholder palettes are kept in `src/data/palettes.seed.ts`. The app doesn't use them.
+- **One season:** copy that season's block from `palettes.seed.ts` into `palettes.ts`, replacing the existing block for that season.
+- **All seasons:** in `palettes.ts`, replace everything inside `PALETTES = [ ... ]` with everything inside `SEED_PALETTES = [ ... ]`.
+
+The placeholders were built for the spec's original season ranges and a Great cut-off of 6. If you switch back, also restore those values: the original ranges are listed in `DECISIONS.md` (item 35), and the cut-off is `greatMaxDeltaE` in `src/lib/config.ts`. `npm run seed` rebuilds this backup file and never touches `palettes.ts`.
+
+The tests check every palette, curated ones included. One check is **palette density**: at least 95% of swatches, counted across all seasons, need another swatch in the same season closer than the Great cut-off (ΔE 4). If it fails, your palette has gaps. Fill them with in-between shades rather than changing the threshold.
 
 ## Tuning
 
@@ -63,8 +75,8 @@ No other file holds numbers that affect scoring.
 
 The input color and every swatch are converted to CIE Lab (D65). For each season, the app measures the CIEDE2000 distance (ΔE) from the input to each swatch and averages the 3 nearest. A lower ΔE is a better match.
 
-- **Great:** ΔE < 6
-- **Okay:** ΔE 6–12
+- **Great:** ΔE < 4
+- **Okay:** ΔE 4–12
 - **Avoid:** ΔE > 12
 - **Match %:** 100 − 5 × ΔE, clamped to the range 0–100
 

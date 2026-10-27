@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { PALETTES, type Palette } from '../src/data/palettes';
-import { SEASONS, getSeason } from '../src/data/seasons';
+import { SEASONS, getSeason, type Season, type SeasonId } from '../src/data/seasons';
 import { deltaE, parseHex } from '../src/lib/color';
 import { CONFIG } from '../src/lib/config';
 import {
@@ -46,11 +46,14 @@ describe('palette density (leave-one-out)', () => {
 });
 
 describe('verdict boundaries', () => {
+  // Spec examples (5.99 / 6 / 12 / 12.01) expressed relative to the configured cut-offs.
+  const g = CONFIG.greatMaxDeltaE;
+  const o = CONFIG.okayMaxDeltaE;
   test.each([
-    [5.99, 'great'],
-    [6, 'okay'],
-    [12, 'okay'],
-    [12.01, 'avoid'],
+    [g - 0.01, 'great'],
+    [g, 'okay'],
+    [o, 'okay'],
+    [o + 0.01, 'avoid'],
     [0, 'great'],
     [40, 'avoid'],
   ] as const)('ΔE %s → %s', (d, level) => {
@@ -117,9 +120,14 @@ describe('scoreAllSeasons', () => {
 });
 
 describe('reason priority (Section 7, step 6)', () => {
-  const softSummer = getSeason('soft-summer'); // L 35–75, C 8–30, cool-neutral
-  const softAutumn = getSeason('soft-autumn'); // warm-neutral
-  const trueSummer = getSeason('true-summer'); // cool
+  // Fixed test seasons (the spec's original values), so these tests check the
+  // reason logic and don't break when the real ranges in seasons.ts are tuned.
+  const fixture = (id: SeasonId, name: string, undertone: Season['undertone'], lRange: [number, number], cRange: [number, number]): Season => ({
+    ...getSeason(id), name, undertone, lRange, cRange,
+  });
+  const softSummer = fixture('soft-summer', 'Soft Summer', 'cool-neutral', [35, 75], [8, 30]);
+  const softAutumn = fixture('soft-autumn', 'Soft Autumn', 'warm-neutral', [35, 75], [10, 35]);
+  const trueSummer = fixture('true-summer', 'True Summer', 'cool', [45, 80], [15, 45]);
 
   test('1. too light wins over everything', () => {
     // Also too bright, and the best season is warm: "too light" must still win.
@@ -181,7 +189,7 @@ describe('verdictFor', () => {
   test('pure white is not Great for Soft Summer and explains why', () => {
     const { verdict } = verdictFor('#ffffff', 'soft-summer', PALETTES, SEASONS);
     expect(verdict.level).not.toBe('great');
-    expect(verdict.reason).toMatch(/^Too light: L\* 100 vs Soft Summer max 75$/);
+    expect(verdict.reason).toBe(`Too light: L* 100 vs Soft Summer max ${getSeason('soft-summer').lRange[1]}`);
   });
 
   test('level matches the saved season deltaE', () => {

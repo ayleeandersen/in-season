@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { PALETTES } from '../data/palettes';
 import { SEASONS, type SeasonFamily, type SeasonId } from '../data/seasons';
-import { PlaceholderBadge } from './PlaceholderBadge';
 
 const FAMILIES: { id: SeasonFamily; label: string }[] = [
   { id: 'spring', label: 'Spring' },
@@ -35,7 +34,6 @@ function SeasonList({ selected, onSelect }: SeasonListProps) {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {SEASONS.filter((s) => s.family === family.id).map((season) => {
               const isSelected = season.id === selected;
-              const palette = PALETTES.find((p) => p.seasonId === season.id);
               return (
                 <button
                   key={season.id}
@@ -63,7 +61,6 @@ function SeasonList({ selected, onSelect }: SeasonListProps) {
                       <span key={hex} className="flex-1" style={{ backgroundColor: hex }} />
                     ))}
                   </span>
-                  {palette?.source === 'seed' && <PlaceholderBadge />}
                 </button>
               );
             })}
