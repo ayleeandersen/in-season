@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { ColorInput } from './components/ColorInput';
+import { PaletteView } from './components/PaletteView';
 import { SeasonPickerDialog, SeasonPickerPage } from './components/SeasonPicker';
 import { SeasonRanking } from './components/SeasonRanking';
 import { VerdictCard } from './components/VerdictCard';
@@ -67,6 +68,12 @@ export default function App() {
             Enter a hex code, use the picker, or tap a photo to check a color against {season.name}.
           </p>
         )}
+
+        <PaletteView
+          season={season}
+          palette={PALETTES.find((p) => p.seasonId === mySeason)}
+          highlight={result?.score.nearest.map((n) => n.hex)}
+        />
       </main>
 
       <SeasonPickerDialog
