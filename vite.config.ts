@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// GitHub Pages serves the app from /in-season/. The deploy workflow sets BASE_PATH;
+// local dev and preview stay at /.
+const base = process.env.BASE_PATH ?? '/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -16,8 +21,8 @@ export default defineConfig({
         name: 'In Season',
         short_name: 'In Season',
         description: 'Check whether a color fits your seasonal color palette.',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#fafaf9',
@@ -31,7 +36,7 @@ export default defineConfig({
       workbox: {
         // Precache the whole app shell so it loads offline after the first visit.
         globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
-        navigateFallback: '/index.html',
+        navigateFallback: `${base}index.html`,
       },
     }),
   ],

@@ -82,7 +82,11 @@ The input color and every swatch are converted to CIE Lab (D65). For each season
 
 The core logic is in `src/lib/score.ts`. It's a pure module with no React or DOM code, so it can be reused later, for example in a browser extension.
 
-## Deploy to Vercel
+## Live site (GitHub Pages)
+
+The app is live at **https://ayleeandersen.github.io/in-season/**. Every push to `main` runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml), which runs the tests, builds the app under the `/in-season/` path (`BASE_PATH`) and publishes it. A failing test stops the deploy. Progress shows in the repo's **Actions** tab.
+
+## Deploy to Vercel (alternative)
 
 1. Push this folder to a GitHub, GitLab or Bitbucket repo.
 2. At [vercel.com/new](https://vercel.com/new), **import** that repo.

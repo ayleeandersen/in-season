@@ -97,3 +97,7 @@ Judgment calls made while building from `color-season-checker-BUILD-SPEC.md`. Ea
     | **ΔE 4, ~220 swatches (chosen)** | **98%** | **32%** | **32%** |
 
     Some overlap is expected, because the analyst's Soft Summer and Soft Autumn palettes share neutrals and teals. The verdict-boundary tests now follow `CONFIG`, not hard-coded 6 / 12.
+
+## Hosting (2026-10-28)
+
+39. **The app is hosted on GitHub Pages, and the repo is now public**, at the owner's request. Free GitHub plans only allow Pages on public repos. This makes the code and the Elemental Colour palette hex codes public. Pages serves the app from `/in-season/`, so the build reads its base path from `BASE_PATH`, which only the deploy workflow sets. The manifest scope, start URL and offline fallback all follow that base path. Local dev stays at `/`.
