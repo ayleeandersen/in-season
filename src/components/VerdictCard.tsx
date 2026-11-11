@@ -26,9 +26,10 @@ interface VerdictCardProps {
   season: Season;
   score: SeasonScore;
   verdict: Verdict;
+  onOpenSwatch: (hex: string) => void; // tap a close match to view it large
 }
 
-export function VerdictCard({ hex, season, score, verdict }: VerdictCardProps) {
+export function VerdictCard({ hex, season, score, verdict, onOpenSwatch }: VerdictCardProps) {
   const style = LEVEL_STYLE[verdict.level];
   return (
     <section
@@ -70,12 +71,19 @@ export function VerdictCard({ hex, season, score, verdict }: VerdictCardProps) {
           </h3>
           <ul className="grid grid-cols-3 gap-2">
             {score.nearest.map((n) => (
-              <li key={n.hex} className="overflow-hidden rounded-lg border border-stone-200 dark:border-stone-700">
-                <div className="h-12" style={{ backgroundColor: n.hex }} aria-hidden="true" />
-                <div className="px-2 py-1.5 text-xs">
-                  <div className="font-mono">{n.hex}</div>
-                  <div className="text-stone-600 dark:text-stone-400">ΔE {n.deltaE.toFixed(1)}</div>
-                </div>
+              <li key={n.hex}>
+                <button
+                  type="button"
+                  onClick={() => onOpenSwatch(n.hex)}
+                  aria-label={`${n.hex}, ΔE ${n.deltaE.toFixed(1)}. View full screen`}
+                  className="block w-full overflow-hidden rounded-lg border border-stone-200 text-left hover:border-stone-500 dark:border-stone-700 dark:hover:border-stone-400"
+                >
+                  <div className="h-12" style={{ backgroundColor: n.hex }} aria-hidden="true" />
+                  <div className="px-2 py-1.5 text-xs">
+                    <div className="font-mono">{n.hex}</div>
+                    <div className="text-stone-600 dark:text-stone-400">ΔE {n.deltaE.toFixed(1)}</div>
+                  </div>
+                </button>
               </li>
             ))}
           </ul>

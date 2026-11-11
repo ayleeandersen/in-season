@@ -5,10 +5,11 @@ interface PaletteViewProps {
   season: Season;
   palette: Palette | undefined;
   highlight?: string[]; // hex codes to outline, e.g. the nearest swatches to the current color
+  onOpen: (hex: string) => void; // tap a swatch to view it large
 }
 
 /** The whole palette for a season, so a fan deck or garment can be compared by eye. */
-export function PaletteView({ season, palette, highlight = [] }: PaletteViewProps) {
+export function PaletteView({ season, palette, highlight = [], onOpen }: PaletteViewProps) {
   if (!palette) return null;
   const marked = new Set(highlight.map((h) => h.toLowerCase()));
 
@@ -22,6 +23,7 @@ export function PaletteView({ season, palette, highlight = [] }: PaletteViewProp
       </h2>
       <p className="mt-1 mb-4 text-sm text-stone-600 dark:text-stone-400">
         All {palette.swatches.length} {season.name} colors.
+        Tap one to see it full screen.
         {marked.size > 0 && ' Outlined: the closest matches to your color.'}
       </p>
       <ul
@@ -31,16 +33,20 @@ export function PaletteView({ season, palette, highlight = [] }: PaletteViewProp
         {palette.swatches.map((hex) => {
           const isMarked = marked.has(hex.toLowerCase());
           return (
-            <li
-              key={hex}
-              title={hex}
-              className={`aspect-square rounded ${
-                isMarked
-                  ? 'ring-2 ring-stone-900 ring-offset-2 ring-offset-white dark:ring-white dark:ring-offset-stone-900'
-                  : ''
-              }`}
-              style={{ backgroundColor: hex }}
-            />
+            <li key={hex}>
+              <button
+                type="button"
+                title={hex}
+                aria-label={`${hex}${isMarked ? ', close match' : ''}`}
+                onClick={() => onOpen(hex)}
+                className={`block aspect-square w-full rounded ${
+                  isMarked
+                    ? 'ring-2 ring-stone-900 ring-offset-2 ring-offset-white dark:ring-white dark:ring-offset-stone-900'
+                    : ''
+                }`}
+                style={{ backgroundColor: hex }}
+              />
+            </li>
           );
         })}
       </ul>

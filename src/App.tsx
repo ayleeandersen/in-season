@@ -3,6 +3,7 @@ import { ColorInput } from './components/ColorInput';
 import { PaletteView } from './components/PaletteView';
 import { SeasonPickerDialog, SeasonPickerPage } from './components/SeasonPicker';
 import { SeasonRanking } from './components/SeasonRanking';
+import { SwatchViewer } from './components/SwatchViewer';
 import { VerdictCard } from './components/VerdictCard';
 import { PALETTES } from './data/palettes';
 import { SEASONS, getSeason, type SeasonId } from './data/seasons';
@@ -13,6 +14,7 @@ export default function App() {
   const [mySeason, setMySeason] = useState<SeasonId | null>(() => loadMySeason());
   const [pickerOpen, setPickerOpen] = useState(false);
   const [hex, setHex] = useState<string | null>(null);
+  const [viewIndex, setViewIndex] = useState<number | null>(null); // palette swatch shown full screen
   const chipRef = useRef<HTMLButtonElement>(null);
 
   const chooseSeason = (id: SeasonId) => {
@@ -31,6 +33,12 @@ export default function App() {
   if (!mySeason) return <SeasonPickerPage onSelect={chooseSeason} />;
 
   const season = getSeason(mySeason);
+  const palette = PALETTES.find((p) => p.seasonId === mySeason);
+  const swatches = palette?.swatches ?? [];
+  const openSwatch = (h: string) => {
+    const i = swatches.indexOf(h);
+    if (i >= 0) setViewIndex(i);
+  };
 
   return (
     <>
@@ -60,6 +68,7 @@ export default function App() {
               season={season}
               score={result.score}
               verdict={result.verdict}
+              onOpenSwatch={openSwatch}
             />
             <SeasonRanking ranking={result.ranking} mySeasonId={mySeason} />
           </>
@@ -71,8 +80,9 @@ export default function App() {
 
         <PaletteView
           season={season}
-          palette={PALETTES.find((p) => p.seasonId === mySeason)}
+          palette={palette}
           highlight={result?.score.nearest.map((n) => n.hex)}
+          onOpen={openSwatch}
         />
       </main>
 
@@ -81,6 +91,14 @@ export default function App() {
         selected={mySeason}
         onSelect={chooseSeason}
         onClose={() => setPickerOpen(false)}
+      />
+
+      <SwatchViewer
+        swatches={swatches}
+        index={viewIndex}
+        seasonName={season.name}
+        onIndexChange={setViewIndex}
+        onClose={() => setViewIndex(null)}
       />
     </>
   );
