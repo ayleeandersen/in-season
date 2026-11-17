@@ -23,7 +23,9 @@ export function PhotoSampler({ onSample }: PhotoSamplerProps) {
   const loupeRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const [hasImage, setHasImage] = useState(false);
+  // Bumped on every successful load, so a second photo redraws too (0 = no photo yet).
+  const [imageVersion, setImageVersion] = useState(0);
+  const hasImage = imageVersion > 0;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [point, setPoint] = useState<Point | null>(null);
@@ -73,10 +75,10 @@ export function PhotoSampler({ onSample }: PhotoSamplerProps) {
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, width, height);
       offscreenRef.current = off;
-      setHasImage(true);
+      setImageVersion((v) => v + 1);
     } catch {
       setError("Couldn't open that image. Try a JPEG or PNG.");
-      setHasImage(false);
+      setImageVersion(0);
       offscreenRef.current = null;
     } finally {
       URL.revokeObjectURL(url);
@@ -84,10 +86,10 @@ export function PhotoSampler({ onSample }: PhotoSamplerProps) {
     }
   };
 
-  // Draw once the canvas has mounted for a newly loaded image.
+  // Draw each newly loaded image once the canvas has mounted.
   useEffect(() => {
-    if (hasImage) drawDisplay();
-  }, [hasImage, drawDisplay]);
+    if (imageVersion > 0) drawDisplay();
+  }, [imageVersion, drawDisplay]);
 
   const sampleAt = useCallback(
     (p: Point) => {
