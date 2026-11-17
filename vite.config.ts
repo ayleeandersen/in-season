@@ -15,7 +15,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      injectRegister: false, // registered in src/main.tsx so the app can check for updates
       includeAssets: ['favicon-32x32.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'In Season',
@@ -34,6 +34,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // A new version takes over as soon as it's downloaded, instead of waiting
+        // until every open copy of the app is closed (which rarely happens on phones).
+        skipWaiting: true,
+        clientsClaim: true,
         // Precache the whole app shell so it loads offline after the first visit.
         globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
         navigateFallback: `${base}index.html`,
